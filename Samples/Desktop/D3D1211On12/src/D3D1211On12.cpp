@@ -12,7 +12,7 @@
 #include "stdafx.h"
 #include "D3D1211On12.h"
 
-static const WCHAR text[] = L"11On12";
+static const WCHAR msg_text[] = L"11On12";
 
 D3D1211on12::D3D1211on12(UINT width, UINT height, std::wstring name) :
     DXSample(width, height, name),
@@ -490,7 +490,7 @@ void D3D1211on12::RenderUI()
     m_d2dDeviceContext->SetTarget(m_d2dRenderTargets[m_frameIndex].Get());
     m_d2dDeviceContext->BeginDraw();
     m_d2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
-    m_d2dDeviceContext->DrawText(text, _countof(text) - 1, m_textFormat.Get(), &textRect, m_textBrush.Get());
+    m_d2dDeviceContext->DrawText(msg_text, _countof(msg_text) - 1, m_textFormat.Get(), &textRect, m_textBrush.Get());
     ThrowIfFailed(m_d2dDeviceContext->EndDraw());
 
     // Release our wrapped render target resource. Releasing 

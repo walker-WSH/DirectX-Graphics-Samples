@@ -28,6 +28,8 @@ void D3D1211on12::OnInit()
 {
     LoadPipeline();
     LoadAssets();
+
+    OpenSharedTexture((HANDLE)0xC0002AC2);
 }
 
 // Load the rendering pipeline dependencies.
@@ -490,6 +492,12 @@ void D3D1211on12::RenderUI()
     m_d2dDeviceContext->SetTarget(m_d2dRenderTargets[m_frameIndex].Get());
     m_d2dDeviceContext->BeginDraw();
     m_d2dDeviceContext->SetTransform(D2D1::Matrix3x2F::Identity());
+    
+    // 方法1: 直接绘制整个位图
+    if (sharedBitmap) {
+        D2D1_SIZE_F bitmapSize = sharedBitmap->GetSize();
+        m_d2dDeviceContext->DrawBitmap(sharedBitmap, D2D1::RectF(0, 0, bitmapSize.width, bitmapSize.height));
+    }
     m_d2dDeviceContext->DrawText(msg_text, _countof(msg_text) - 1, m_textFormat.Get(), &textRect, m_textBrush.Get());
     ThrowIfFailed(m_d2dDeviceContext->EndDraw());
 

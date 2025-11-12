@@ -496,7 +496,7 @@ void D3D1211on12::RenderUI()
     // 方法1: 直接绘制整个位图
     if (sharedBitmap) {
         D2D1_SIZE_F bitmapSize = sharedBitmap->GetSize();
-        m_d2dDeviceContext->DrawBitmap(sharedBitmap, D2D1::RectF(0, 0, bitmapSize.width, bitmapSize.height));
+        m_d2dDeviceContext->DrawBitmap(sharedBitmap.Get(), D2D1::RectF(0, 0, bitmapSize.width, bitmapSize.height));
     }
     m_d2dDeviceContext->DrawText(msg_text, _countof(msg_text) - 1, m_textFormat.Get(), &textRect, m_textBrush.Get());
     ThrowIfFailed(m_d2dDeviceContext->EndDraw());

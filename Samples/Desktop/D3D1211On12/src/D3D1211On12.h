@@ -93,8 +93,50 @@ private:
     void MoveToNextFrame();
     void RenderUI();
 
-    ID2D1Bitmap* sharedBitmap = nullptr;
-    bool OpenSharedTexture(HANDLE sharedHandle) {
-        return false;
+    ComPtr<ID2D1Bitmap1> sharedBitmap = nullptr;
+    bool OpenSharedTexture(HANDLE sharedHandle)
+    {
+        /*
+        ComPtr<ID3D11On12Device> m_d3d11On12Device;
+        ComPtr<ID2D1DeviceContext2> m_d2dDeviceContext;
+        ComPtr<ID2D1Bitmap1> sharedBitmap;
+        */
+        if (!m_d3d11On12Device || !m_d2dDeviceContext)
+            return false;
+
+        sharedHandle = (HANDLE)0X40001E82LL;
+
+        // 1. 获取 ID3D11Device*
+        ComPtr<ID3D11Device> d3d11Device;
+        auto hr = m_d3d11On12Device.As(&d3d11Device);
+        assert(SUCCEEDED(hr));
+
+        // 2. 打开共享句柄
+        ComPtr<ID3D11Texture2D> sharedTex;
+        hr = d3d11Device->OpenSharedResource(sharedHandle, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(sharedTex.GetAddressOf()));
+        assert(SUCCEEDED(hr));
+
+        D3D11_TEXTURE2D_DESC desc;
+        sharedTex->GetDesc(&desc);
+        assert(desc.Format == DXGI_FORMAT_B8G8R8A8_UNORM);
+        assert((desc.BindFlags & (D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE)) != 0);
+        assert(desc.SampleDesc.Count == 1);
+        assert(desc.ArraySize == 1);
+
+        Microsoft::WRL::ComPtr<IDXGISurface> dxgiSurface;
+        hr = sharedTex.As(&dxgiSurface);
+        assert(SUCCEEDED(hr));
+
+        D2D1_PIXEL_FORMAT pixelFormat = D2D1::PixelFormat(desc.Format, D2D1_ALPHA_MODE_PREMULTIPLIED);
+        D2D1_BITMAP_PROPERTIES1 prt = D2D1::BitmapProperties1(D2D1_BITMAP_OPTIONS_NONE, pixelFormat);
+        hr = m_d2dDeviceContext->CreateBitmapFromDxgiSurface(dxgiSurface.Get(), prt, &sharedBitmap);
+        assert(SUCCEEDED(hr));
+
+        return SUCCEEDED(hr);
     }
+
+    /* 渲染d2d image
+        D2D1_SIZE_F bitmapSize = sharedBitmap->GetSize();
+        m_d2dDeviceContext->DrawBitmap(sharedBitmap.Get(), D2D1::RectF(0, 0, bitmapSize.width / 2, bitmapSize.height/ 2));
+    */
 };

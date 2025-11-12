@@ -95,22 +95,6 @@ private:
 
     ID2D1Bitmap* sharedBitmap = nullptr;
     bool OpenSharedTexture(HANDLE sharedHandle) {
-        if (!m_d2dDeviceContext)
-            return false;
-
-        // 使用 CreateSharedBitmap 打开共享纹理
-        HRESULT hr = m_d2dDeviceContext->CreateSharedBitmap(
-            __uuidof(IDXGISurface),  // 资源类型
-            sharedHandle,            // 共享句柄
-            nullptr,                 // 位图属性（可选）
-            &sharedBitmap            // 输出的D2D位图
-        );
-
-        assert(SUCCEEDED(hr));
-        if (SUCCEEDED(hr)) {
-            return true;
-        }
-
         return false;
     }
 };
